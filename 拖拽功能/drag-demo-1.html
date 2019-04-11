@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>模拟jq的ajax的jsonp</title>
+</head>
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+	}
+	.div1{
+		width: 200px;
+		height: 200px;
+		border: 1px solid red;
+		position: relative;
+		margin-left:20px;
+		float: left;
+	}
+	.div2{
+		width: 200px;
+		height: 200px;
+		border: 1px solid blue;
+		position: relative;
+		margin-left:20px;
+		float: left;
+	}
+	.div3{
+		width: 200px;
+		height: 200px;
+		border: 1px solid green;
+		position: relative;
+		margin-left:20px;
+		float: left;
+	}
+	p{
+		background-color: orange;
+		margin-top: 5px;
+	}
+</style>
+<body>
+	<div class="div1">
+		<p draggable="true" id="pe">试着把我拖过去</p>
+	</div>
+	<div class="div2"></div>
+	<script>
+		/*这几次拖拽的事件源都是当前被拖拽的元素*/
+		/*开始拖拽*/
+		document.addEventListener("dragstart",function(e){
+			//设置当前目标元素的透明度，产生拖拽效果
+			e.target.style.opacity=0.4;
+			//将当前的被拖拽元素的id号存储到事件源对象中
+		/*通过dataTransfer来实现数据的存储与获取
+			* setData(format,data):
+			* format:数据的类型：text/html   text/uri-list
+			* Data:数据:一般来说是字符串值*/
+			e.dataTransfer.setData("Text", e.target.id);
+		});
+	  /*拖拽进行中*/
+		document.addEventListener("drag",function(e){
+			e.target.parentNode.style.borderColor="green";
+		});
+		/*拖拽结束*/
+		document.addEventListener("dragend",function(e){
+			e.target.style.opacity=1;
+			e.target.parentNode.style.borderColor="red";
+		});
+	
+		/*下面几个方法的事件源是目标元素，而不是被拖拽的元素*/
+		/*当将当前元素拖拽到另外一个元素上时触发*/
+		document.addEventListener("dragenter",function(e){
+			if(e.target.className=="div2"){
+				e.target.style.borderColor="pink";
+			}
+			else if(e.target.className=="div1"){
+				e.target.style.borderColor="red";
+			}
+		});
+	
+		/*拖拽元素在目标元素上移动时触发*/
+		document.addEventListener("dragover",function(e){
+			/*默认情况下，一个元素不能拖拽到另外一个元素内，如果想允许拖拽，我们必须阻止默认的事件冒泡*/
+			e.preventDefault();
+		});
+		/*当拖拽元素离开目标元素时触发*/
+		document.addEventListener("dragleave",function(e){
+			if(e.target.className=="div2"){
+				e.target.style.borderColor="blue";
+			}
+		});
+		/*当拖拽元素在目标元素上松开的时候触发*/
+		document.addEventListener("drop",function(e){
+			if(e.target.className=="div2" || e.target.className=="div1"){
+				//2.还原目标元素的默认样式
+				e.target.style.borderColor="blue";
+				//3.获取被拖拽元素的id
+				var id= e.dataTransfer.getData("Text");
+				//4.追加被拖拽元素到目标元素
+				e.target.appendChild(document.getElementById(id));
+			}
+		});
+	</script>
+
+</body>
+
+
+</html>
